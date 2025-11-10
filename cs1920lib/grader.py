@@ -10,35 +10,66 @@ class CheckResult:
 
 
 def example_checks():
-    """Very simple check, just to verify the library installed in Colab."""
     return [CheckResult("example", True, "Library installed correctly")]
 
 
-def lab01_public_checks(bank_account_cls) -> list[CheckResult]:
-    """
-    Light, public safe checks for Lab 01.
-    You will call this from the notebook with the student's BankAccount class.
-    Do not put edge case tricks here. Save those for the private repo.
-    """
-    results: list[CheckResult] = []
+def lab01_public_checks(bank_account_cls):
+    results = []
 
+    # Constructor with owner and initial balance
     try:
         acc = bank_account_cls("Ada", 100)
         if getattr(acc, "balance", None) == 100:
             results.append(CheckResult("constructor sets balance", True))
         else:
-            results.append(CheckResult("constructor sets balance", False, f"Got balance={getattr(acc, 'balance', None)}"))
+            results.append(
+                CheckResult(
+                    "constructor sets balance",
+                    False,
+                    f"Expected balance 100, got {getattr(acc, 'balance', None)}",
+                )
+            )
     except Exception as e:
-        results.append(CheckResult("constructor sets balance", False, f"Exception: {e}"))
+        results.append(
+            CheckResult("constructor sets balance", False, f"Exception: {e}")
+        )
 
+    # Deposit
     try:
         acc = bank_account_cls("Ada", 0)
         acc.deposit(50)
         if getattr(acc, "balance", None) == 50:
             results.append(CheckResult("deposit increases balance", True))
         else:
-            results.append(CheckResult("deposit increases balance", False, f"Got balance={getattr(acc, 'balance', None)}"))
+            results.append(
+                CheckResult(
+                    "deposit increases balance",
+                    False,
+                    f"Expected balance 50, got {getattr(acc, 'balance', None)}",
+                )
+            )
     except Exception as e:
-        results.append(CheckResult("deposit increases balance", False, f"Exception: {e}"))
+        results.append(
+            CheckResult("deposit increases balance", False, f"Exception: {e}")
+        )
+
+    # Withdraw
+    try:
+        acc = bank_account_cls("Ada", 100)
+        acc.withdraw(40)
+        if getattr(acc, "balance", None) == 60:
+            results.append(CheckResult("withdraw decreases balance", True))
+        else:
+            results.append(
+                CheckResult(
+                    "withdraw decreases balance",
+                    False,
+                    f"Expected balance 60, got {getattr(acc, 'balance', None)}",
+                )
+            )
+    except Exception as e:
+        results.append(
+            CheckResult("withdraw decreases balance", False, f"Exception: {e}")
+        )
 
     return results
