@@ -1,0 +1,69 @@
+Section 1:
+
+with open("readme.txt") as f:
+    for line in f:
+        print(line.strip())
+
+or
+
+f = open("readme.txt")
+for line in f:
+    print(line.strip())
+f.close()
+
+
+Section 2:
+with open("grades.csv") as f:
+    for line in f:
+        data = line.split(",")
+        name = data[0]
+        age = int(data[1])
+        attendance = int(data[2])
+        assignments = int(data[3])
+        midterm = int(data[4])
+        final = int(data[5])
+        comment = data[6]
+        grade = attendance/26*10 + assignments/40*20 + midterm/85*30 + final/120*40
+        print(f"{name}: {grade:.2f}%")
+
+
+Section 3:
+
+with open("grades2.csv") as f:
+    for line in f:
+        line = line.strip()
+        if line[0] == "#":
+            continue
+        data = line.split(",")
+        name = data[0].strip()
+        age = int(data[1].strip())
+        attendance = int(data[2].strip())
+        assignments = int(data[3].strip())
+        midterm = int(data[4].strip())
+        final = int(data[5].strip())
+        comment = data[6].strip()
+        grade = attendance/26*10 + assignments/40*20 + midterm/85*30 + final/120*40
+        print(f"{name}: {grade:.2f}%")
+
+Section 4:
+
+with open("output.txt","w") as output:
+    with open("grades2.csv") as f:
+        for line in f:
+            line = line.strip()
+            if line[0] == "#":
+                continue
+            data = line.split(",")
+            name = data[0].strip()
+            age = int(data[1].strip())
+            attendance = int(data[2].strip())
+            assignments = int(data[3].strip())
+            midterm = int(data[4].strip())
+            final = int(data[5].strip())
+            comment = data[6].strip()
+            grade = attendance/26*10 + assignments/40*20 + midterm/85*30 + final/120*40
+            output.write(f"{name}: {grade:.2f}%\n")
+
+with open("output.txt") as result:
+    for line in result:
+        print(line.strip())
