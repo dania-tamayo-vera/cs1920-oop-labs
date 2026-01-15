@@ -1,0 +1,68 @@
+Section 1:
+
+class BankAccount(object): # this is the class header
+    def __init__(self, name, balance=0):
+        self.name = name
+        self.balance = balance
+
+    def deposit(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            self.balance += amount
+        else:
+            print("Balance unchanged.")
+
+    def withdraw(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            if amount > self.balance:
+                print("Balance exceeded. Withdrawing available funds.")
+                amount = self.balance
+            self.balance -= amount
+        else:
+            print("Balance unchanged.")
+        return amount
+
+    def print_account(self):
+        print("Name:", self.name)
+        print("Balance:", self.balance)
+
+Section 2:
+
+class BankAccount(object): # this is the class header
+    def __init__(self, name, balance=0):
+        self.name = name
+        self.balance = balance
+        self.withdraw_override = False
+
+    def set_name(self, name):
+        self.name = name
+
+    def get_name(self):
+        return self.name
+
+    def enable_override(self):
+        self.withdraw_override = True
+
+    def disable_override(self):
+        self.withdraw_override = False
+
+    def deposit(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            self.balance += amount
+        else:
+            print("Balance unchanged.")
+
+    def withdraw(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            if not self.withdraw_override and amount > self.balance:
+                print("Balance exceeded. Withdrawing available funds.")
+                amount = self.balance
+            self.balance -= amount
+        else:
+            print("Balance unchanged.")
+        return amount
+
+    def __str__(self):
+        return_value = ""
+        return_value += f"Name: {self.name}\n"
+        return_value += f"Balance: {self.balance}"
+        return return_value
