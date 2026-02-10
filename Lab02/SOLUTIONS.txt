@@ -1,0 +1,323 @@
+*** SECTION 1 ***
+
+# LAB 2 SECTION 1:  This is the solution to Lab 1 Section 2 (last week's lab).  You will modify this code to the specifications shown above.
+# There is a comment to show you where to put them.
+
+class BankAccount(object): # this is the class header
+    def __init__(self, name, balance=0):
+        self.__name = name
+        self.__balance = balance
+        self.__withdraw_override = False
+
+    def set_name(self, name):
+        self.__name = name
+
+    def get_name(self):
+        return self.__name
+
+    def enable_override(self):
+        self.__withdraw_override = True
+
+    def disable_override(self):
+        self.__withdraw_override = False
+
+    def deposit(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            self.__balance += amount
+        else:
+            print("Balance unchanged.")
+
+    def withdraw(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            if not self.__withdraw_override and amount > self.__balance:
+                print("Balance exceeded. Withdrawing available funds.")
+                amount = self.__balance
+            self.__balance -= amount
+        else:
+            print("Balance unchanged.")
+        return amount
+
+    # INSERT THE SIX DUNDER METHODS BELOW THIS COMMENT LINE
+
+    def __lt__(self, other): # returns True if this account's name is less than the other account's name - otherwise, return None (signalling failure)
+        if isinstance(other, BankAccount):
+            return self.__name < other.get_name()
+
+    def __eq__(self, other):
+        if isinstance(other, BankAccount):
+            return self.__name == other.get_name()
+
+    def __gt__(self, other):
+        if isinstance(other, BankAccount):
+            return self.__name > other.get_name()
+
+    def __le__(self, other):
+        if isinstance(other, BankAccount):
+            return self.__name <= other.get_name()
+
+    def __ge__(self, other):
+        if isinstance(other, BankAccount):
+            return self.__name >= other.get_name()
+
+    def __ne__(self, other):
+        if isinstance(other, BankAccount):
+            return self.__name != other.get_name()
+
+    # INSERT THE SIX DUNDER METHODS ABOVE THIS COMMENT LINE
+
+    def __str__(self):
+        return_value = ""
+        return_value += f"Name: {self.__name}\n"
+        return_value += f"Balance: {self.__balance}"
+        return return_value
+
+### TESTING CODE - DO NOT ALTER ###
+
+b1 = BankAccount("Chris", 100)
+b2 = BankAccount("Dania", 250)
+b3 = BankAccount("Andrew", 25)
+b4 = BankAccount("Antonio", 125)
+b5 = BankAccount("Taif", 175)
+b6 = BankAccount("Andrew", 4000) # A different Andrew, this one has serious money!
+
+print(f"Checking if account b1 ({b1.get_name()}) comes before account b3 ({b3.get_name()}) using names")
+print(b1 < b3)
+
+print(f"Checking if account b3 and b6 have the same name (comparing {b3.get_name()} and {b6.get_name()})")
+print(b3 == b6)
+
+print(f"Comparing account b2 ({b2.get_name()}) and b4 ({b4.get_name()}) on all operations in order:")
+print("<:",b2 < b4)
+print("==:",b2 == b4)
+print(">:",b2 > b4)
+print("<=:",b2 <= b4)
+print(">=:",b2 >= b4)
+print("!=:",b2 != b4)
+
+# REMEMBER, THE OUTPUT WINDOW SCROLLS IF YOU DON'T SEE ALL THE OUTPUT!
+
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+*** SECTION 2 ***
+
+# COPY AND PASTE YOUR SECTION 1 CODE BELOW THIS LINE, OMITTING THE TESTING CODE
+
+# LAB 2 SECTION 2:  This is the solution to Lab 1 Section 2 (last week's lab).  You will modify this code to the specifications shown above.
+# There is a comment to show you where to put them.
+
+class BankAccount(object): # this is the class header
+
+    __compare_by = "name"
+
+    def __init__(self, name, balance=0):
+        self.__name = name
+        self.__balance = balance
+        self.__withdraw_override = False
+
+    def set_compare_by(mode): # static method
+        modes = ['name','balance']
+        if mode in modes:
+            BankAccount.__compare_by = mode
+        else:
+            print("Invalid comparator.")
+
+    def get_balance(self):
+        return self.__balance
+
+    def set_name(self, name):
+        self.__name = name
+
+    def get_name(self):
+        return self.__name
+
+    def enable_override(self):
+        self.__withdraw_override = True
+
+    def disable_override(self):
+        self.__withdraw_override = False
+
+    def deposit(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            self.__balance += amount
+        else:
+            print("Balance unchanged.")
+
+    def withdraw(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            if not self.__withdraw_override and amount > self.__balance:
+                print("Balance exceeded. Withdrawing available funds.")
+                amount = self.__balance
+            self.__balance -= amount
+        else:
+            print("Balance unchanged.")
+        return amount
+
+    # INSERT THE SIX DUNDER METHODS BELOW THIS COMMENT LINE
+
+    def __lt__(self, other): # returns True if this account's name is less than the other account's name - otherwise, return None (signalling failure)
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name < other.get_name()
+            else:
+                return self.__balance < other.get_balance()
+
+    def __eq__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name == other.get_name()
+            else:
+                return self.__balance == other.get_balance()
+
+    def __gt__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name > other.get_name()
+            else:
+                return self.__balance > other.get_balance()
+
+    def __le__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name <= other.get_name()
+            else:
+                return self.__balance <= other.get_balance()
+
+    def __ge__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name >= other.get_name()
+            else:
+                return self.__balance >= other.get_balance()
+
+    def __ne__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name != other.get_name()
+            else:
+                return self.__balance != other.get_balance()
+
+    # INSERT THE SIX DUNDER METHODS ABOVE THIS COMMENT LINE
+
+    def __str__(self):
+        return_value = ""
+        return_value += f"Name: {self.__name}\n"
+        return_value += f"Balance: {self.__balance}"
+        return return_value
+
+### TESTING CODE - DO NOT ALTER ###
+
+b1 = BankAccount("Chris", 100)
+b2 = BankAccount("Dania", 250)
+b3 = BankAccount("Andrew", 25)
+b4 = BankAccount("Antonio", 125)
+b5 = BankAccount("Taif", 175)
+b6 = BankAccount("Andrew", 4000) # A different Andrew, this one has serious money!
+
+print("Setting mode: balance")
+BankAccount.set_compare_by("balance")
+
+print(f"\nChecking if account b1 ({b1.get_name()}:{b1.get_balance()}) comes before account b6 ({b6.get_name()}:{b6.get_balance()}) using balance")
+print(b1 < b6)
+
+print("\nSetting mode: name")
+BankAccount.set_compare_by("name")
+
+print(f"\nChecking if account b3 and b6 have the same name (comparing {b3.get_name()} and {b6.get_name()})")
+print(b3 == b6)
+
+print("\nAttempt to set mode to foozball")
+BankAccount.set_compare_by("foozball") # should fail, and no change to mode
+
+# mode is still name
+print(f"\nComparing account b2 ({b2.get_name()}) and b6 ({b6.get_name()}) on all operations in order:")
+print("<:",b2 < b6)
+print("==:",b2 == b6)
+print(">:",b2 > b6)
+print("<=:",b2 <= b6)
+print(">=:",b2 >= b6)
+print("!=:",b2 != b6)
+
+print("\nChanging mode to balance")
+BankAccount.set_compare_by("balance")
+
+# mode is still name
+print(f"\nComparing account b2 ({b2.get_name()}:{b2.get_balance()}) and b6 ({b6.get_name()}:{b6.get_balance()}) on all operations in order using balance:")
+print("<:",b2 < b6)
+print("==:",b2 == b6)
+print(">:",b2 > b6)
+print("<=:",b2 <= b6)
+print(">=:",b2 >= b6)
+print("!=:",b2 != b6)
+
+# REMEMBER, THE OUTPUT WINDOW SCROLLS IF YOU DON'T SEE ALL THE OUTPUT!
+
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+*** SECITON 3 ***
+
+# WRITE YOUR BankAccounts CLASS BELOW THIS LINE
+
+class BankAccounts(object):
+    def __init__(self):
+        self.__account_list = []
+
+    def add_account(self, account):
+        if isinstance(account, BankAccount):
+            self.__account_list.append(account)
+
+    def remove_account(self, account):
+        if isinstance(account, BankAccount):
+            try:
+                self.__account_list.remove(account)
+            except ValueError:
+                return False
+            return True
+
+    def bank_total(self):
+        total = 0
+        for account in self.__account_list:
+            total += account.get_balance()
+        return total
+
+    def __str__(self):
+        return_value = ""
+        for account in self.__account_list:
+            return_value += f"{account}\n"
+        return return_value
+
+
+
+# TESTING CODE - DO NOT MODIFY
+
+# Accounts b1 to b6 are still available, as is the Section 2 BankAccount class.  We don't need to set any of that up.
+accounts = BankAccounts()
+accounts.add_account(b1)
+accounts.add_account(b2)
+accounts.add_account(b3)
+accounts.add_account(b4)
+accounts.add_account(b5)
+accounts.add_account(b6)
+
+print(f"List of accounts:\n{accounts}")
+
+print(f"Total in Bank: {accounts.bank_total()}")
+
+print("\nRemove account b5:", b5.get_name())
+print(accounts.remove_account(b5))
+
+print("\nRemove account b6:", b6.get_name())
+print(accounts.remove_account(b6))
+
+print('\nAttempt to remove account "Dania" which is not an account but a string')
+print(accounts.remove_account("Dania")) # not an account object, so should return None
+
+print("\nAttempt to remove account b6:", b6.get_name(), " - which was previously removed.")
+print(accounts.remove_account(b6)) # already removed, should return False
+
+print(f"\nList of accounts:\n{accounts}")
+
+print(f"Total in Bank: {accounts.bank_total()}")
