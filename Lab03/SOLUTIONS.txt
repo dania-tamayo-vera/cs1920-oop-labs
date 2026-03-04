@@ -1,0 +1,309 @@
+*** SECTION 0 *** THIS IS GIVEN CODE
+
+# This is the top-level of an inheritance hierarchy.  This class will never be instantiated - it's too generic to be of direct use.
+# However, it will allow us to store the common concepts of a BankAccount.  It also contains a minor enhancement, the addition of
+# an account identification code, which can be alphanumeric.
+
+class BankAccount(object): # this is the class header
+
+    __compare_by = "name"
+
+    def __init__(self, name, account_id, balance=0):
+        self.__name = name
+        self.__account_id = account_id
+        self.__balance = balance
+        self.__withdraw_override = False
+
+    def set_compare_by(mode): # static method - NOW WITH ID AS A COMPARISON BASIS
+        modes = ['name','id','balance']
+        if mode in modes:
+            BankAccount.__compare_by = mode
+        else:
+            print("Invalid comparator.")
+
+    def get_balance(self):
+        return self.__balance
+
+    def set_id(self, account_id):
+        self.__account_id = account_id
+
+    def get_id(self):
+        return self.__account_id
+
+    def set_name(self, name):
+        self.__name = name
+
+    def get_name(self):
+        return self.__name
+
+    def enable_override(self):
+        self.__withdraw_override = True
+
+    def disable_override(self):
+        self.__withdraw_override = False
+
+    def deposit(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            self.__balance += amount
+        else:
+            print("Balance unchanged.")
+
+    def withdraw(self, amount):
+        if isinstance(amount, int) or isinstance(amount, float):
+            if not self.__withdraw_override and amount > self.__balance:
+                print("Balance exceeded. Withdrawing available funds.")
+                amount = self.__balance
+            self.__balance -= amount
+        else:
+            print("Balance unchanged.")
+        return amount
+
+    def monthly_processing(self):
+        pass # this is where account interest and fees will be added for savings and chequing accounts; fees only for retirement savings accounts
+
+    def __lt__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name < other.get_name()
+            elif BankAccount.__compare_by == "id":
+                return self.__account_id < other.get_id()
+            else:
+                return self.__balance < other.get_balance()
+
+    def __eq__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name == other.get_name()
+            elif BankAccount.__compare_by == "id":
+                return self.__account_id == other.get_id()
+            else:
+                return self.__balance == other.get_balance()
+
+    def __gt__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name > other.get_name()
+            elif BankAccount.__compare_by == "id":
+                return self.__account_id > other.get_id()
+            else:
+                return self.__balance > other.get_balance()
+
+    def __le__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name <= other.get_name()
+            elif BankAccount.__compare_by == "id":
+                return self.__account_id <= other.get_id()
+            else:
+                return self.__balance <= other.get_balance()
+
+    def __ge__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name >= other.get_name()
+            elif BankAccount.__compare_by == "id":
+                return self.__account_id >= other.get_id()
+            else:
+                return self.__balance >= other.get_balance()
+
+    def __ne__(self, other):
+        if isinstance(other, BankAccount):
+            if BankAccount.__compare_by == "name":
+                return self.__name != other.get_name()
+            elif BankAccount.__compare_by == "id":
+                return self.__account_id != other.get_id()
+            else:
+                return self.__balance != other.get_balance()
+
+    def __str__(self):
+        return_value = f"Name: {self.__name}\tID: {self.__account_id}\tBalance: {self.__balance}"
+        return return_value
+
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+
+***SECTION 1***
+
+class ChequingAccount(BankAccount): # Note that a ChequingAccount extends BankAccount - previously this was just 'object'
+
+# now write your constructor and other methods as required
+
+    def __init__(self, name, account_id, balance=0):
+        super().__init__(name, account_id, balance)
+
+    def process_cheque(self,amount):
+        cheque_fee = 1.25
+        nsf_fee = 40
+        if (isinstance(amount, int) or isinstance(amount, float)) and self.get_balance() >= cheque_fee:
+            self.withdraw(cheque_fee) # charge the cheque processing fee
+            attempt = self.withdraw(amount) # attempt to process the money
+            if attempt < amount: # could not fulfill the cheque requested
+                self.deposit(attempt) # put the money back in the account
+                self.enable_override() # enable overdraft override
+                self.withdraw(nsf_fee) # charge the NSF fee to the account, putting it into overdraft
+                self.disable_override() # disable the override
+                return 0 # unable to honour cheque, sorry person trying to cash, you lose
+            else:
+                return amount # success, full amount was withdrawn in attempt
+        return None # failed, this is the standard signal for failure
+
+    def monthly_processing(self):
+        monthly_fee = 16.75
+        overdraft_fee = 25
+        self.enable_override() # bank processing overrides normal protections
+        self.withdraw(monthly_fee) # charge the fee
+        if self.get_balance() < 0: # if that caused an overdraft
+            self.withdraw(overdraft_fee) # charge the overdraft amount (they get you EVERY TIME)
+        self.disable_override() # disable override
+
+    def __str__(self):
+        return_value = "CHEQUING ACCOUNT\t" + super().__str__()
+        if self.get_balance() < 0:
+            return_value += "\nACCOUNT IS IN OVERDRAFT."
+        return return_value
+
+#### TEST CODE - DO NOT ALTER ####
+
+ca = ChequingAccount("Chris","SB0031066838",100)
+print(f"Attempting to process $85 cheque: {ca.process_cheque(85)}") # should return 85
+print(f"Balance: {ca.get_balance()}")
+print(f"\nAttempting to process $25 cheque: {ca.process_cheque(25)}") # should be NSF returning 0
+print("\nAccount status:")
+print(ca) # should show overdraft status
+ca.monthly_processing() # do monthly processing
+ca.yearly_processing() # do yearly processing
+print("\nPost-processing status:")
+print(ca)
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+
+***SECTION 2***
+
+class SavingsAccount(BankAccount):
+    def __init__(self, name, account_id, balance=0):
+        super().__init__(name, account_id, balance)
+        self.__apr = 0.05
+
+    def monthly_processing(self):
+        monthly_interest = self.__apr / 12
+        maintenance_fee = 2.50
+        overdraft_fee = 50
+        fees = 0
+
+        if self.get_balance() < 1000: # determine if below 1000 then apply maintenance fee
+            fees += maintenance_fee
+
+        if self.get_balance() < 0:
+            account_interest = 0
+        else:
+            account_interest = self.get_balance() * monthly_interest # calculate interest
+
+        self.deposit(account_interest)
+
+        self.enable_override() # now the bank applies any of its fees, may create overdraft
+        self.withdraw(fees)
+        if self.get_balance() < 0:
+            self.withdraw(overdraft_fee)
+        self.disable_override() # reestablish overdraft prevention
+
+    def __str__(self):
+        return_value = "SAVINGS ACCOUNT\t" + super().__str__() + f"\tAPR: {round(self.__apr * 100,0)}%"
+        if self.get_balance() < 0:
+            return_value += "\nACCOUNT IS IN OVERDRAFT."
+        return return_value
+
+#### TEST CODE - DO NOT ALTER ####
+
+sa = SavingsAccount("Chris","SB0031065742",900)
+print(f"Starting balance: ${sa.get_balance()}")
+sa.deposit(200)
+print(f"\nProcess $200 deposit, new balance ${sa.get_balance()}") # should return 1100
+print("\nSix months go by with no additional deposits or withdrawals . . . ")
+sa.monthly_processing()
+print(f"Month 1 balance: ${sa.get_balance():.2f}")
+sa.monthly_processing()
+print(f"Month 2 balance: ${sa.get_balance():.2f}")
+sa.monthly_processing()
+print(f"Month 3 balance: ${sa.get_balance():.2f}")
+sa.monthly_processing()
+print(f"Month 4 balance: ${sa.get_balance():.2f}")
+sa.monthly_processing()
+print(f"Month 5 balance: ${sa.get_balance():.2f}")
+sa.monthly_processing()
+print(f"Month 6 balance: ${sa.get_balance():.2f}")
+print("\nAccount status:")
+print(sa)
+print()
+print("Withdrawing everything in the account!  PARTY TIME!")
+sa.withdraw(sa.get_balance())
+print("\nAccount status:")
+print(sa)
+print("\nProcessing monthly fees and interest . . . whoops.  That account's empty.")
+sa.monthly_processing()
+print(f"Month 7 balance: ${sa.get_balance():.2f}") # should show overdraft status
+print("Ended month with a negative balance (maintenance fee, then overdraft fee).  Womp, womp.")
+sa.yearly_processing() # do yearly processing
+print("\nFinal post-processing status:")
+print(sa)
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+
+***SECTION 3***
+
+class RetirementSavings(BankAccount):
+    def __init__(self, name, account_id, balance=0):
+        super().__init__(name,account_id,balance)
+        self.__taxable_income = 0.0
+        self.__apr = 0.13 # APR for RRSPs
+
+    def withdraw(self, amount, taxable=True):
+        processed = super().withdraw(amount) # this will be the amount you were able to get, up to "all of it"
+        if taxable:
+            self.__taxable_income += processed # that's taxable incoming
+        return processed
+
+    def yearly_processing(self):
+        yearly_fee = 125
+        overdraft_fee = 150
+
+        if not self.get_balance() < 0:
+            interest = self.get_balance() * self.__apr
+            self.deposit(interest)
+        self.enable_override() # time to apply fees
+        self.withdraw(yearly_fee, False) # fee not taxable
+        if self.get_balance() < 0:
+            self.withdraw(overdraft_fee, False)
+
+    def __str__(self):
+        return_value = "RETIREMENT SAVINGS\t" + super().__str__() + f"\tAPR: {self.__apr * 100}%"
+        return_value += f"\nTAXABLE INCOME: ${self.__taxable_income:.2f}"
+        if self.get_balance() < 0:
+            return_value += "\nACCOUNT IS IN OVERDRAFT."
+        return return_value
+
+##### TESTING CODE - DO NOT ALTER #####
+rs = RetirementSavings("Chris","SB0032824957", 150000)
+print("Initial amount in account:")
+print(rs)
+
+print("\n10 years go by with an annual contribution of 10000 made before year-end...\n")
+for i in range(1,11):
+    rs.deposit(10000)
+    rs.yearly_processing()
+    print(f"Year {i}:")
+    print(rs)
+    print()
+
+print("Time to withdraw it all and live my best life!")
+party = rs.withdraw(rs.get_balance())
+print("\nYear-end happens, but no deposit this year.")
+rs.yearly_processing()
+print("\nFinal account status:")
+print(rs)
+print(f"\nBut I don't care, because I'm off spending my ${party:.2f} (less income tax)\npartying someplace the weather is nice, and I won't be back!")
